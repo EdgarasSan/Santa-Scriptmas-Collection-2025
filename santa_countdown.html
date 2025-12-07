@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santa's Magical ASCII Countdown</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a472a 0%, #0f2b1a 100%);
+            font-family: 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #fff;
+        }
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+        }
+        .ascii-art {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            line-height: 1.2;
+            white-space: pre;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            margin: 20px 0;
+        }
+        .message {
+            font-size: 24px;
+            color: #ff6b6b;
+            margin-top: 30px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+        }
+        .launch {
+            font-size: 36px;
+            color: #4ecca3;
+            font-weight: bold;
+            animation: pulse 0.5s infinite;
+            text-shadow: 0 0 20px rgba(78, 204, 163, 0.8);
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        button {
+            background: linear-gradient(135deg, #ff6b6b, #ff4757);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 25px rgba(255, 107, 107, 0.6);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .snowflake {
+            position: fixed;
+            top: -10px;
+            color: white;
+            font-size: 20px;
+            pointer-events: none;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="display">
+            <h1 style="color: #ffd700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);">🎅 Santa's Magical Countdown 🎄</h1>
+            <button onclick="startCountdown()">Start Countdown!</button>
+        </div>
+    </div>
+
+    <script>
+        const DIGITS = [
+            // 0
+            " ###  \n#   # \n#   # \n#   # \n ###  ",
+            // 1
+            "  #   \n ##   \n  #   \n  #   \n##### ",
+            // 2
+            " ###  \n#   # \n  ##  \n #    \n##### ",
+            // 3
+            " ###  \n#   # \n  ##  \n#   # \n ###  ",
+            // 4
+            "#   # \n#   # \n##### \n    # \n    # ",
+            // 5
+            "##### \n#     \n###   \n    # \n####  ",
+            // 6
+            " ###  \n#     \n####  \n#   # \n ###  ",
+            // 7
+            "##### \n    # \n   #  \n  #   \n #    ",
+            // 8
+            " ###  \n#   # \n ###  \n#   # \n ###  ",
+            // 9
+            " ###  \n#   # \n #### \n    # \n ###  ",
+            // 10 (special case - we'll display 1 and 0 side by side)
+        ];
+
+        const MESSAGES = [
+            "🎅 Santa is checking his list twice...",
+            "🦌 Reindeer are warming up...",
+            "🎁 Loading presents onto the sleigh...",
+            "⭐ Rudolf's nose is glowing bright...",
+            "🔔 Jingle bells are ringing...",
+            "🎄 Elves are giving final checks...",
+            "❄️ Snow is falling perfectly...",
+            "🌟 Magic is building up...",
+            "🛷 Sleigh is warming up...",
+            "🎵 Christmas carols playing...",
+            "🚀 Ready for liftoff..."
+        ];
+
+        let countdownInterval;
+
+        function createSnowflakes() {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const snowflake = document.createElement('div');
+                    snowflake.className = 'snowflake';
+                    snowflake.textContent = '❄';
+                    snowflake.style.left = Math.random() * 100 + '%';
+                    snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    snowflake.style.opacity = Math.random();
+                    document.body.appendChild(snowflake);
+                    setTimeout(() => snowflake.remove(), 5000);
+                }, i * 100);
+            }
+        }
+
+        function getASCIINumber(num) {
+            if (num === 10) {
+                // Combine digits 1 and 0
+                const lines1 = DIGITS[1].split('\n');
+                const lines0 = DIGITS[0].split('\n');
+                return lines1.map((line, i) => line + '  ' + lines0[i]).join('\n');
+            }
+            return DIGITS[num];
+        }
+
+        async function startCountdown() {
+            createSnowflakes();
+            
+            for (let i = 10; i >= 0; i--) {
+                const display = document.getElementById('display');
+                const ascii = getASCIINumber(i);
+                
+                if (i === 0) {
+                    display.innerHTML = `
+                        <div class="ascii-art">${ascii}</div>
+                        <div class="launch">🎅 SANTA'S SLEIGH IS LAUNCHING! 🎄</div>
+                        <div style="margin-top: 30px; font-size: 40px;">🛷✨🌟</div>
+                    `;
+                } else {
+                    display.innerHTML = `
+                        <h2 style="color: #ffd700;">Timer: ${i}</h2>
+                        <div class="ascii-art">${ascii}</div>
+                        <div class="message">${MESSAGES[i]}</div>
+                    `;
+                }
+                
+                if (i > 0) {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    if (i % 3 === 0) createSnowflakes();
+                } else {
+                    // Add extra celebration at launch
+                    setTimeout(() => {
+                        display.innerHTML += '<div style="margin-top: 20px; font-size: 20px;">🎉 Merry Christmas! 🎉</div>';
+                        display.innerHTML += '<br><button onclick="startCountdown()">Launch Again!</button>';
+                    }, 2000);
+                }
+            }
+        }
+
+        // Initial snowflakes
+        createSnowflakes();
+    </script>
+</body>
+</html>
