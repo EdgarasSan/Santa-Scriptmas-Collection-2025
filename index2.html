@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skaičiuotuvas | EDGAR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+      }
+
+      :root {
+        --primary: #c41e3a;
+        --secondary: #146b3a;
+        --accent: #f8b229;
+        --bg: #0f0f0f;
+        --card: #1a1a1a;
+        --border: #2a2a2a;
+        --text: #ffffff;
+        --text-muted: #a0a0a0;
+      }
+
+      body {
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+
+      .container {
+        max-width: 600px;
+        width: 100%;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2.5rem;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--text);
+      }
+
+      .subtitle {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+      }
+
+      .input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text);
+        font-size: 1rem;
+        transition: all 0.2s;
+      }
+
+      .input:focus {
+        outline: none;
+        border-color: var(--primary);
+      }
+
+      .input::placeholder {
+        color: #555;
+      }
+
+      .btn {
+        width: 100%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform 0.2s;
+        margin-top: 1rem;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .results {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+        display: none;
+      }
+
+      .results.show {
+        display: block;
+        animation: fadeIn 0.3s;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .result-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.875rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .result-item:last-child {
+        border-bottom: none;
+      }
+
+      .result-label {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      .result-value {
+        font-weight: 600;
+        color: var(--text);
+        font-size: 1rem;
+      }
+
+      .result-value.extra {
+        color: var(--accent);
+      }
+
+      .total {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid var(--border);
+      }
+
+      .total .result-label {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .total .result-value {
+        font-size: 1.5rem;
+        color: var(--accent);
+      }
+
+      .note {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: rgba(248, 178, 41, 0.1);
+        border: 1px solid rgba(248, 178, 41, 0.2);
+        border-radius: 8px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: 2rem;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+
+      @media (max-width: 640px) {
+        .container {
+          padding: 1.5rem;
+        }
+
+        .title {
+          font-size: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1 class="title">Skaičiuotuvas | EDGAR</h1>
+        <p class="subtitle">Apskaičiuokite plytelių kiekį ir kainą</p>
+      </div>
+
+      <form id="form">
+        <div class="form-group">
+          <label class="label" for="length">Kambario ilgis (m)</label>
+          <input
+            type="number"
+            id="length"
+            class="input"
+            placeholder="Pvz: 5.5"
+            min="0"
+            step="0.01"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="width">Kambario plotis (m)</label>
+          <input
+            type="number"
+            id="width"
+            class="input"
+            placeholder="Pvz: 4.2"
+            min="0"
+            step="0.01"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="price">Kaina už m²</label>
+          <input
+            type="number"
+            id="price"
+            class="input"
+            placeholder="Pvz: 25.00"
+            min="0"
+            step="0.01"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn">Apskaičiuoti</button>
+      </form>
+
+      <div id="results" class="results">
+        <div class="result-item">
+          <span class="result-label">Pagrindo plotas:</span>
+          <span class="result-value" id="baseArea">0.00 m²</span>
+        </div>
+
+        <div class="result-item">
+          <span class="result-label">Papildomi 5%:</span>
+          <span class="result-value extra" id="extraArea">+0.00 m²</span>
+        </div>
+
+        <div class="result-item">
+          <span class="result-label">Iš viso plytelių:</span>
+          <span class="result-value" id="totalArea">0.00 m²</span>
+        </div>
+
+        <div class="result-item total">
+          <span class="result-label">Bendra kaina:</span>
+          <span class="result-value" id="totalCost">0.00 €</span>
+        </div>
+
+        <div class="note">
+          <strong>Pastaba:</strong> Papildomi 5% padengia galimą medžiagos
+          švaistymo ir pjaustymo nuostolius.
+        </div>
+      </div>
+
+      <div class="footer">Sukūrė: EDGARAS</div>
+    </div>
+
+    <script>
+      const form = document.getElementById("form");
+      const results = document.getElementById("results");
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const length = parseFloat(document.getElementById("length").value);
+        const width = parseFloat(document.getElementById("width").value);
+        const price = parseFloat(document.getElementById("price").value);
+
+        if (length > 0 && width > 0 && price > 0) {
+          const baseArea = length * width;
+          const extraArea = baseArea * 0.05;
+          const totalArea = baseArea + extraArea;
+          const totalCost = totalArea * price;
+
+          document.getElementById("baseArea").textContent =
+            baseArea.toFixed(2) + " m²";
+          document.getElementById("extraArea").textContent =
+            "+" + extraArea.toFixed(2) + " m²";
+          document.getElementById("totalArea").textContent =
+            totalArea.toFixed(2) + " m²";
+          document.getElementById("totalCost").textContent =
+            totalCost.toFixed(2) + " €";
+
+          results.classList.add("show");
+        }
+      });
+    </script>
+  </body>
+</html>
